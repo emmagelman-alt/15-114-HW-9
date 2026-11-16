@@ -21,3 +21,43 @@ I made five one-line changes to the source on my Mac, one at a time. After each 
 | 3 | `app.py` line 23: `MIN_SCORE` default `'8.0'` → `'9.0'` | `test_match_meets_every_search_criterion` (`tests/test_match.py`) | `assert 0 > 0` (where `0 = len([])`) |
 | 4 | `app.py` line 208: `(not cuisine or ...)` → `(True or ...)` | `test_match_meets_every_search_criterion` (`tests/test_match.py`) | `AssertionError: LV. Coffee Project isn't tagged Thai: ['Coffee', 'Coffee Shop']` |
 | 5 | `app.py` line 220: `attempts = [(f.cuisine, f.category)]` → `attempts = [(None, f.category)]` | `test_match_meets_every_search_criterion` (`tests/test_match.py`) | `assert 0 > 0` (where `0 = len([])`) |
+
+## Getting to 8 passing tests (done with Claude Code)
+
+**Starting point:** 4 tests. 2 passed, and 2 failed because of the real bugs in `app.py` described above.
+
+### 4 new tests
+
+| # | Test | File | What it checks |
+|---|---|---|---|
+| 5 | `checkReply throws the server's message when the request fails` | `tests/reply-handling.test.js` | A failed request with a text `detail` throws an error carrying that text |
+| 6 | `errorText says the server is waking up when the network request fails` | `tests/reply-handling.test.js` | A network `TypeError` shows the "Sorry, I'm still waking up!" message |
+| 7 | `test_load_places_merges_repeat_entries_into_one` | `tests/test_load_places.py` | Raku in New York City is on the Beli list 3 times (9.6, 8.6, 8.4) and becomes one place that keeps 9.6 |
+| 8 | `test_extract_filters_throws_out_a_city_not_in_the_list` | `tests/test_extract_filters.py` | A city that isn't in the list ("Atlantis") is still thrown out, so the accent fix below can't let made-up cities through |
+
+All four passed on their first run, before any code was changed. That made 8 tests: 6 passing, 2 failing.
+
+### 2 bug fixes in `app.py`
+
+| Bug | Test that showed it | Fix |
+|---|---|---|
+| `match()`: "Korean restaurant in Pittsburgh" returned all 23 Pittsburgh restaurants, because the "don't broaden to any restaurant" check only ran when no place type was given | `test_match_does_not_swap_a_cuisine_for_any_restaurant` | When a cuisine and a place type are both asked for, only fall back to "any place of that type" if the type isn't `restaurant`. "Japanese dessert" can still fall back to any dessert spot. Now the bot says it hasn't found a Korean spot there. |
+| `extract_filters()`: "San Sebastian" (no accent) was thrown out, because the check compared exact text | `test_extract_filters_keeps_a_real_city_typed_without_its_accent` | New helper `in_list()` compares the way the rest of the file does (`norm()`, ignoring capitals and accents) and keeps the list's own spelling: "San Sebastian" → "San Sebastián". Anything not in the list still becomes `None`. |
+
+No test's checks were changed to make it pass. The only edits to existing tests were the comments on the two that used to fail ("fails on purpose" → "failed until fixed").
+
+### Checking the fixes didn't break anything else
+
+- Ran the old and new `match()` on all 49,216 possible searches (every city or country × every cuisine × every place type). The only searches that changed were "cuisine + restaurant" where there's no spot of that cuisine: before, every restaurant came back; now, none do.
+- Every real value in the list passes the `extract_filters()` check exactly as before, except "Ice cream", which now maps to "Ice Cream". The list has both spellings, and the search finds the same 7 places either way.
+- Still not handled: letters that are their own letter rather than an accent, like the ø in Sørvågen. "Sorvagen" is still thrown out.
+- The line numbers earlier in this file refer to `app.py` before these fixes. `match()` now starts at line 226.
+
+### Results
+
+| Command | Result |
+|---|---|
+| `node --test` | 3 passed, 0 failed |
+| `.venv/bin/python -m pytest -v` | 5 passed, 0 failed |
+
+**8 of 8 tests pass.** The GitHub Actions workflow (`.github/workflows/tests.yml`) still only runs the 3 JavaScript tests.

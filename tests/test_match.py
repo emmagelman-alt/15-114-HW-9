@@ -19,8 +19,9 @@ def test_match_does_not_swap_a_cuisine_for_any_restaurant():
     """Asking for a Korean restaurant in Pittsburgh, where there are no Korean spots,
     should NOT hand back every restaurant in Pittsburgh.
 
-    This is the bug from testing.md: the "don't broaden to any restaurant" check is
-    skipped when both a cuisine and a place type are given. Fails on purpose."""
+    This is the bug from testing.md: the "don't broaden to any restaurant" check was
+    skipped when both a cuisine and a place type were given. This test failed until
+    match() was fixed (see testing.md)."""
     hits, used = match(Filters(city="Pittsburgh", cuisine="Korean", category="restaurant"))
 
     # Collect every place that came back without the Korean tag
