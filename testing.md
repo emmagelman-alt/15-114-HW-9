@@ -61,3 +61,8 @@ No test's checks were changed to make it pass. The only edits to existing tests 
 | `.venv/bin/python -m pytest -v` | 5 passed, 0 failed |
 
 **8 of 8 tests pass.** The GitHub Actions workflow (`.github/workflows/tests.yml`) still only runs the 3 JavaScript tests.
+
+Claude changed the test to catch the accent bug for citie slike san sebastiàn. a neew helper filter ignores accents and capitals to make sure that even mispelled requests still recevie the intended result. It also fixed the bug where the system would send every list in a location if it couldnt find an exact cuisine match, now it doesnt default to every other place if it cant find a match. 
+
+AI USAGE SUMMERY. I used ai for all the ai relevant steps in the nstructins such as the remaining tests, dettingup a suite, etc. I also used AI to help me understand the asignment. I think i had the mo ttehcnical difficulty with this assignment so I used ai to help me figure out what to do and outline and guide me. I explicitly told me not to give me the direct answers but to make sure I could get to them on my own. An example of this is "yes set it up but dont run the test or make it, help me write the tets by hand dont write it for me". 
+
