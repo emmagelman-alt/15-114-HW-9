@@ -1,0 +1,671 @@
+/* ------------------------------------------------------------------
+   Scene sizing
+   The drawing is 1600x900. `.scene` is laid out at exactly that size and
+   scaled by JS to fit the window, so every coordinate below is in the
+   drawing's own pixels.
+   I used claude code to write the entire website. I gave feedback on the chsnges when needed for iteration however I did not perosanlyl write a single line of code.
+   I did draw each animation frame and graphic by hand and mocked them up on wireframes witht he correct apect ratio to give to claude. In that respect, the design is entirely my own.
+ 
+------------------------------------------------------------------- */
+:root {
+  --scene-w: 1600;
+  --scene-h: 900;
+  --ink: #14142b;           /* the dark navy ink of the drawing */
+  --paper: #ffffff;
+  --font: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  overflow: hidden;
+}
+
+.stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.scene {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--scene-w) * 1px);
+  height: calc(var(--scene-h) * 1px);
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  transform-origin: center center;
+  background: var(--paper);
+}
+
+/* ------------------------------------------------------------------
+   Animation frames (stacked, one visible at a time)
+------------------------------------------------------------------- */
+.frames { position: absolute; inset: 0; }
+
+.frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.frame.is-active { opacity: 1; }
+
+/* Static copy of the phone area (from frame 1) layered over every frame */
+.phone-static {
+  position: absolute;
+  left: 30px;
+  top: 640px;
+  width: 310px;
+  height: 210px;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ------------------------------------------------------------------
+   Whiteboard title (same Helvetica-style caps as the ABOUT card)
+   The board's inner face spans x 683-1522, y 72-508 in the drawing.
+   Whiteboard serves a space to showcase projects, I wanted it to feel like my studio setup!
+------------------------------------------------------------------- */
+.board-title {
+  position: absolute;
+  left: 683px;
+  top: 100px;
+  width: 839px;
+  margin: 0;
+  text-align: center;
+  font: 400 46px/1 var(--font);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ------------------------------------------------------------------
+   Credit line
+   Sits in the empty strip between the desk's right leg (x 921) and the
+   whiteboard's right leg (x 1512), near the bottom of the drawing.
+------------------------------------------------------------------- */
+.credit {
+  position: absolute;
+  left: 921px;
+  top: 856px;
+  width: 591px;
+  margin: 0;
+  text-align: center;
+  font: 400 13px/1.3 var(--font);
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------
+   Project notes pinned to the progress board
+   The notes live in a scrolling area that fills the whiteboard's inner
+   face (x 683-1522, y 72-508) below the board title. Two notes fit side
+   by side; the rest wrap onto new rows, reached with the scroll bar on
+   the board's right-hand side. The padding puts the first row exactly
+   where the notes have always sat (x 700 / 1086, y 164) and leaves room
+   for the hover lift.
+------------------------------------------------------------------- */
+.board-notes {
+  position: absolute;
+  left: 683px;
+  top: 160px;
+  width: 839px;
+  height: 348px;
+  padding: 4px 0 16px 17px;
+  display: grid;
+  grid-template-columns: repeat(2, 336px);
+  column-gap: 50px;
+  row-gap: 32px;
+  align-content: start;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* scroll bar drawn in the same ink as the board */
+.board-notes::-webkit-scrollbar { width: 12px; }
+.board-notes::-webkit-scrollbar-track {
+  background: var(--paper);
+  border-left: 1.5px solid var(--ink);
+}
+.board-notes::-webkit-scrollbar-thumb {
+  background: var(--ink);
+  border: 3px solid var(--paper);
+  border-radius: 6px;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .board-notes {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ink) var(--paper);
+  }
+}
+
+.note {
+  position: relative;
+  width: 336px;
+  height: 336px;
+  display: block;
+  color: var(--ink);
+  text-decoration: none;
+  transition: transform 140ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.note:hover,
+.note:focus-visible {
+  transform: translateY(-4px) rotate(-0.4deg);
+  outline: none;
+}
+
+/* the drawn sheet sits behind everything else in the note */
+.note-paper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.note-paper rect {
+  fill: var(--paper);
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+
+.note-pin { fill: var(--ink); }
+
+.note-shot { position: absolute; left: 24px; width: 288px; }
+
+/* everything below the screenshot flows in order inside this box */
+.note-body {
+  position: absolute;
+  left: 24px;
+  top: 210px;
+  width: 288px;
+  display: block;
+}
+
+.note-shot {
+  top: 40px;
+  height: 162px;          /* 288 x 162 keeps the page's 16:9 shape, no crop */
+  object-fit: fill;
+  border: 1.5px solid var(--ink);
+}
+
+.note-title {
+  display: block;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.note-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 7px;
+}
+
+.note-tags span {
+  font-size: 9px;
+  line-height: 1;
+  padding: 3px 5px;
+  border: 1px solid var(--ink);
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.note-desc {
+  display: block;
+  margin-top: 7px;
+  font-size: 9.5px;
+  line-height: 1.32;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note { transition: none; }
+}
+
+/* ------------------------------------------------------------------
+   Hotspots (invisible clickable regions over parts of the drawing)
+------------------------------------------------------------------- */
+.hotspot {
+  position: absolute;
+  left: calc(var(--x) * 1px);
+  top: calc(var(--y) * 1px);
+  width: calc(var(--w) * 1px);
+  height: calc(var(--h) * 1px);
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 50% / 45%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hotspot.about { border-radius: 12px; }
+
+.hotspot:focus-visible {
+  outline: 3px dashed var(--ink);
+  outline-offset: 4px;
+}
+
+/* ------------------------------------------------------------------
+   Phone screen
+   A 100x150 box that JS maps onto the drawn screen's four corners with
+   a perspective transform (see PHONE_SCREEN in js/script.js). Its white
+   background covers the drawn "00:00" and boxes; the clock and buttons
+   are laid out here in plain 2D and get the drawing's perspective.
+------------------------------------------------------------------- */
+.phone-screen {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100px;
+  height: 150px;
+  transform-origin: 0 0;
+  background: var(--paper);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 8px 0;
+  gap: 7px;
+}
+
+.clock {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.phone-apps {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 27px;
+  padding: 0;
+  margin: 0;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  font: 600 11px/1 var(--font);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 120ms ease, background 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app:hover,
+.app:focus-visible {
+  transform: scale(1.05);
+  background: #f2f2f6;
+  outline: none;
+}
+
+/* ------------------------------------------------------------------
+   "Coming soon" speech bubble
+------------------------------------------------------------------- */
+.bubble {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, calc(-100% - 18px));
+  padding: 10px 16px;
+  font-size: 22px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--ink);
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  /* slightly uneven corners for a hand-drawn feel */
+  border-radius: 18px 22px 20px 24px / 22px 18px 24px 20px;
+  pointer-events: none;
+  z-index: 5;
+  animation: bubble-pop 180ms cubic-bezier(.2,.9,.3,1.3);
+}
+
+/* tail */
+.bubble::before,
+.bubble::after {
+  content: "";
+  position: absolute;
+  left: var(--tail-x, 50%);
+  top: 100%;
+  border-style: solid;
+  border-color: transparent;
+}
+
+.bubble::before {
+  margin-left: -13px;
+  border-width: 16px 13px 0 13px;
+  border-top-color: var(--ink);
+}
+
+.bubble::after {
+  margin-left: -9px;
+  border-width: 11px 9px 0 9px;
+  border-top-color: var(--paper);
+}
+
+/* bubble variant that points up (used when there's no room above) */
+.bubble.below {
+  transform: translate(-50%, 18px);
+}
+.bubble.below::before,
+.bubble.below::after { top: auto; bottom: 100%; }
+.bubble.below::before {
+  border-width: 0 13px 16px 13px;
+  border-top-color: transparent;
+  border-bottom-color: var(--ink);
+}
+.bubble.below::after {
+  border-width: 0 9px 11px 9px;
+  border-top-color: transparent;
+  border-bottom-color: var(--paper);
+}
+
+@keyframes bubble-pop {
+  from { opacity: 0; scale: 0.8; }
+  to   { opacity: 1; scale: 1; }
+}
+
+/* ------------------------------------------------------------------
+   "Need a restaurant rec?" bubble
+   Sits in the gap between Emma's hair and the whiteboard's left leg
+   (x 668), with the tail pointing back down at her.
+------------------------------------------------------------------- */
+.rec-bubble {
+  position: absolute;
+  left: 392px;
+  top: 118px;
+  padding: 10px 16px;
+  font: 500 20px/1.2 var(--font);
+  white-space: nowrap;
+  color: var(--ink);
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  border-radius: 18px 22px 20px 24px / 22px 18px 24px 20px;
+  cursor: pointer;
+  z-index: 4;
+  animation: rec-bob 3s ease-in-out infinite;
+  transition: background 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rec-bubble:hover,
+.rec-bubble:focus-visible,
+.rec-bubble[aria-expanded="true"] {
+  background: #f2f2f6;
+  outline: none;
+}
+
+.rec-bubble:focus-visible {
+  outline: 3px dashed var(--ink);
+  outline-offset: 5px;
+}
+
+/* tail, leaning down-left toward Emma's head */
+.rec-bubble::before,
+.rec-bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  border-style: solid;
+  border-color: transparent;
+}
+
+.rec-bubble::before {
+  left: 18px;
+  border-width: 22px 22px 0 0;
+  border-top-color: var(--ink);
+}
+
+.rec-bubble::after {
+  left: 21px;
+  border-width: 15px 15px 0 0;
+  border-top-color: var(--paper);
+}
+
+.rec-bubble:hover::after,
+.rec-bubble:focus-visible::after,
+.rec-bubble[aria-expanded="true"]::after { border-top-color: #f2f2f6; }
+
+@keyframes rec-bob {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -5px; }
+}
+
+/* ------------------------------------------------------------------
+   Restaurant rec chat
+   On the board it takes the notes' place (x 700-1505, y 160-500) and
+   the board title switches to "Restaurant recs". When the scene is
+   scaled too small to type into, JS moves it out of the scene and it
+   opens as a full-screen sheet instead (.is-sheet).
+------------------------------------------------------------------- */
+.board-notes[hidden],
+.rec-chat[hidden] { display: none; }
+
+.rec-chat {
+  position: absolute;
+  left: 700px;
+  top: 160px;
+  width: 805px;
+  height: 336px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--ink);
+  font-family: var(--font);
+  z-index: 3;
+}
+
+.rec-heading { display: none; }
+
+.rec-close {
+  position: absolute;
+  right: 0;
+  top: -62px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 30px/1 var(--font);
+  cursor: pointer;
+}
+
+.rec-close:hover,
+.rec-close:focus-visible { background: #f2f2f6; outline: none; }
+
+.rec-log {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 14px 4px 2px;
+}
+
+/* same inked scroll bar as the notes */
+.rec-log::-webkit-scrollbar { width: 12px; }
+.rec-log::-webkit-scrollbar-track { background: var(--paper); border-left: 1.5px solid var(--ink); }
+.rec-log::-webkit-scrollbar-thumb { background: var(--ink); border: 3px solid var(--paper); border-radius: 6px; }
+
+@supports not selector(::-webkit-scrollbar) {
+  .rec-log { scrollbar-width: thin; scrollbar-color: var(--ink) var(--paper); }
+}
+
+.rec-msg {
+  max-width: 78%;
+  padding: 10px 14px;
+  font-size: 17px;
+  line-height: 1.35;
+  border: 2.5px solid var(--ink);
+  border-radius: 16px 20px 18px 22px / 20px 16px 22px 18px;
+  overflow-wrap: anywhere;
+}
+
+.rec-msg.from-emma { align-self: flex-start; background: var(--paper); }
+.rec-msg.from-visitor { align-self: flex-end; background: var(--ink); color: var(--paper); }
+.rec-msg.is-thinking { font-style: italic; opacity: 0.7; }
+
+.rec-places {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.rec-places li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1.5px dashed var(--ink);
+}
+
+.rec-score {
+  flex: none;
+  min-width: 36px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.rec-name { font-weight: 600; }
+.rec-meta { display: block; font-size: 0.82em; opacity: 0.75; }
+
+.rec-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rec-suggestions[hidden] { display: none; }
+
+.rec-suggestions button {
+  padding: 6px 12px;
+  font: 400 15px/1 var(--font);
+  color: var(--ink);
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.rec-suggestions button:hover,
+.rec-suggestions button:focus-visible { background: #f2f2f6; outline: none; }
+
+.rec-form {
+  display: flex;
+  gap: 10px;
+}
+
+.rec-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  font: 400 17px/1.2 var(--font);
+  color: var(--ink);
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  border-radius: 14px 18px 16px 20px / 18px 14px 20px 16px;
+}
+
+.rec-form input:focus { outline: 3px dashed var(--ink); outline-offset: 3px; }
+
+.rec-form button {
+  padding: 10px 20px;
+  font: 600 17px/1 var(--font);
+  color: var(--paper);
+  background: var(--ink);
+  border: 3px solid var(--ink);
+  border-radius: 18px 14px 20px 16px / 14px 18px 16px 20px;
+  cursor: pointer;
+}
+
+.rec-form button:disabled { opacity: 0.5; cursor: wait; }
+
+/* Full-screen sheet for small windows (phones) */
+.rec-chat.is-sheet {
+  position: fixed;
+  inset: 0;
+  width: auto;
+  height: auto;
+  padding: 16px;
+  background: var(--paper);
+  z-index: 10;
+}
+
+.rec-chat.is-sheet .rec-heading {
+  display: block;
+  margin: 4px 56px 4px 0;
+  font: 400 26px/1.2 var(--font);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.rec-chat.is-sheet .rec-close { top: 12px; right: 16px; }
+.rec-chat.is-sheet .rec-msg { max-width: 88%; font-size: 16px; }
+/* 16px+ keeps iOS from zooming into the field */
+.rec-chat.is-sheet .rec-form input,
+.rec-chat.is-sheet .rec-form button { font-size: 16px; }
+
+/* ------------------------------------------------------------------
+   Missing-frames notice (only shows if images can't load)
+------------------------------------------------------------------- */
+.missing-frames {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 24px 32px;
+  font-size: 24px;
+  text-align: center;
+  border: 3px dashed var(--ink);
+  border-radius: 16px;
+  background: var(--paper);
+}
+
+.missing-frames code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+  background: #f2f2f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble, .rec-bubble { animation: none; }
+  .app, .rec-bubble { transition: none; }
+}

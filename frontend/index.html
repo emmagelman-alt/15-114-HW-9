@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emma Gelman — Welcome to my desk</title>
+  <link rel="stylesheet" href="css/style.css?v=7" />
+</head>
+<body>
+  <div class="stage">
+    <!--
+      The scene is a fixed 1600x900 canvas (same size as the drawn frames) that
+      gets scaled to fit the window. Everything inside is positioned in the
+      drawing's own pixel coordinates, so hotspots line up on every frame.
+    -->
+    <div class="scene" id="scene">
+
+      <!-- Animation frames: drop your exported frames into images/frames/ -->
+      <div class="frames" id="frames">
+        <img class="frame is-active" src="images/frames/frame-01.png?v=5" alt="Emma at her desk" />
+        <img class="frame" src="images/frames/frame-02.png?v=5" alt="" />
+        <img class="frame" src="images/frames/frame-03.png?v=5" alt="" />
+        <img class="frame" src="images/frames/frame-04.png?v=5" alt="" />
+        <img class="frame" src="images/frames/frame-05.png?v=5" alt="" />
+        <img class="frame" src="images/frames/frame-06.png?v=5" alt="" />
+        <img class="frame" src="images/frames/frame-07.png?v=5" alt="" />
+      </div>
+
+      <!-- Phone + "Contact me!" from frame 1, shown on every frame so the phone
+           (and the clock/buttons on it) never shift between frames -->
+      <img class="phone-static" src="images/phone-static.png?v=5" alt="" />
+
+      <!-- Title written across the top of the whiteboard -->
+      <h2 class="board-title">In progress</h2>
+
+      <!-- Project notes pinned to the progress board. Two fit side by side;
+           any more wrap onto new rows and the board scrolls. -->
+      <div class="board-notes">
+
+      <!-- Project note pinned to the progress board -->
+      <a class="note" href="https://emmagelman-alt.github.io/15-113-portoflio/"
+         aria-label="113 Portfolio — open the project">
+        <!-- square sheet with a pin, behind the content -->
+        <svg class="note-paper" viewBox="0 0 336 336" aria-hidden="true">
+          <rect x="3" y="3" width="330" height="330" />
+          <circle class="note-pin" cx="168" cy="22" r="8" />
+        </svg>
+
+        <img class="note-shot" src="images/project-113-thumb.png?v=5" alt="The desk scene homepage" />
+        <!-- title, tags and description flow in order, so a wrapped tag
+             pushes the text down instead of overlapping it -->
+        <span class="note-body">
+          <span class="note-title">113 Portfolio</span>
+          <span class="note-tags">
+            <span>HTML</span><span>CSS</span><span>JavaScript</span><span>GitHub Pages</span><span>Claude Code</span>
+          </span>
+          <span class="note-desc">
+            Deployed a live working website through GitHub Pages using Claude Code and my own sketches.
+            Animation was drawn by hand and brought to life with Claude Code.
+          </span>
+        </span>
+      </a>
+
+      <!-- Second project note, pinned beside the first -->
+      <a class="note" href="crossy-road/index.html"
+         aria-label="Crossy Road — play the game">
+        <!-- square sheet with a pin, behind the content -->
+        <svg class="note-paper" viewBox="0 0 336 336" aria-hidden="true">
+          <rect x="3" y="3" width="330" height="330" />
+          <circle class="note-pin" cx="168" cy="22" r="8" />
+        </svg>
+
+        <img class="note-shot" src="images/crossy-road-thumb.jpg?v=5" alt="The Crossy Road game, mid-run" />
+        <span class="note-body">
+          <span class="note-title">Crossy Road</span>
+          <span class="note-tags">
+            <span>HTML</span><span>CSS</span><span>JavaScript</span><span>Three.js</span><span>WebGL</span><span>Claude Code</span>
+          </span>
+          <span class="note-desc">
+            An endless road-crossing game built from scratch in the browser. The roads, rivers and
+            railways are generated as you go, so the map is never the same twice.
+          </span>
+        </span>
+      </a>
+
+      <!-- Third project note, on the board's second row -->
+      <a class="note" href="https://github.com/emmagelman-alt/15-113-portoflio/tree/main/barcelona-spanish-practice"
+         target="_blank" rel="noopener noreferrer"
+         aria-label="Sobremesa — view the source and setup instructions on GitHub">
+        <!-- square sheet with a pin, behind the content -->
+        <svg class="note-paper" viewBox="0 0 336 336" aria-hidden="true">
+          <rect x="3" y="3" width="330" height="330" />
+          <circle class="note-pin" cx="168" cy="22" r="8" />
+        </svg>
+
+        <img class="note-shot" src="images/sobremesa-thumb.jpg?v=6" alt="The Sobremesa conversation practice screen, set in Barcelona" />
+        <span class="note-body">
+          <span class="note-title">Sobremesa</span>
+          <span class="note-tags">
+            <span>Python</span><span>FastAPI</span><span>JavaScript</span><span>Groq API</span><span>Whisper</span><span>Codex</span>
+          </span>
+          <span class="note-desc">
+            A voice conversation app for practicing Spanish, Italian, Russian or Mandarin. Talk with a
+            local, get gentle corrections and more natural phrasing, and practice your accent.
+          </span>
+        </span>
+      </a>
+
+      <!-- Fourth project note, beside Sobremesa on the second row -->
+      <a class="note" href="https://github.com/emmagelman-alt/backend-for-restaurant-bot-"
+         target="_blank" rel="noopener noreferrer"
+         aria-label="Restaurant Recs — view the backend source and README on GitHub">
+        <!-- square sheet with a pin, behind the content -->
+        <svg class="note-paper" viewBox="0 0 336 336" aria-hidden="true">
+          <rect x="3" y="3" width="330" height="330" />
+          <circle class="note-pin" cx="168" cy="22" r="8" />
+        </svg>
+
+        <img class="note-shot" src="images/restaurant-recs-thumb.jpg?v=7" alt="The restaurant rec chat on the whiteboard, answering a request for sushi in New York City" />
+        <span class="note-body">
+          <span class="note-title">Restaurant Recs</span>
+          <span class="note-tags">
+            <span>Python</span><span>FastAPI</span><span>Groq API</span><span>Render</span><span>JavaScript</span><span>Claude Code</span><span>ChatGPT</span>
+          </span>
+          <span class="note-desc">
+            Click "need a restaurant rec?" by my desk and ask for a city and a cuisine. A Python
+            backend on Render uses Groq to read the request, then answers only with places I've
+            rated 8.0+ on Beli.
+          </span>
+        </span>
+      </a>
+
+      <!-- Fifth project note, on the board's third row. The demo on Render asks for a
+           password (set there as DEMO_PASSWORD), so nothing secret lives in this page. -->
+      <a class="note" href="https://andean-dashboard-demo.onrender.com"
+         target="_blank" rel="noopener noreferrer"
+         aria-label="Andean Dashboard — open the password-protected demo">
+        <!-- square sheet with a pin, behind the content -->
+        <svg class="note-paper" viewBox="0 0 336 336" aria-hidden="true">
+          <rect x="3" y="3" width="330" height="330" />
+          <circle class="note-pin" cx="168" cy="22" r="8" />
+        </svg>
+
+        <img class="note-shot" src="images/andean-dashboard-thumb.jpg?v=8" alt="The Andean Dashboard: to-dos on the left, calendar and machines on the right" />
+        <span class="note-body">
+          <span class="note-title">Andean Dashboard</span>
+          <span class="note-tags">
+            <span>Python</span><span>FastAPI</span><span>JavaScript</span><span>Slack API</span><span>Notion API</span><span>Figma</span><span>Claude Code</span>
+          </span>
+          <span class="note-desc">
+            An employee dashboard for Andean that turns Slack requests, Notion tasks and Outlook
+            meetings into one to-do list. The live demo is password-protected.
+          </span>
+        </span>
+      </a>
+
+      <!-- Sixth project note, beside the Andean Dashboard on the third row. The real page is inside
+           Andean's private Warp app, so the note opens a copy that runs on sample data. -->
+      <a class="note" href="warp-inventory/index.html"
+         aria-label="Warp Inventory — open the demo with sample data">
+        <!-- square sheet with a pin, behind the content -->
+        <svg class="note-paper" viewBox="0 0 336 336" aria-hidden="true">
+          <rect x="3" y="3" width="330" height="330" />
+          <circle class="note-pin" cx="168" cy="22" r="8" />
+        </svg>
+
+        <img class="note-shot" src="images/warp-inventory-thumb.jpg?v=1" alt="The Inventory page: processed devices by product beside a wheel of the parts left to cut" />
+        <span class="note-body">
+          <span class="note-title">Warp Inventory</span>
+          <span class="note-tags">
+            <span>SQL</span><span>Postgres</span><span>Supabase</span><span>Next.js</span><span>TypeScript</span><span>Claude Code</span>
+          </span>
+          <span class="note-desc">
+            An inventory page for Andean's e-waste line. Every desktop the Lazarus robot cuts open is
+            counted automatically, with a wheel of the parts left to cut. The demo uses sample data.
+          </span>
+        </span>
+      </a>
+
+      </div>
+
+      <!-- Speech bubble from Emma that opens the restaurant rec chat -->
+      <button class="rec-bubble" id="recBubble" type="button"
+              aria-expanded="false" aria-controls="recChat">need a restaurant rec?</button>
+
+      <!-- Restaurant rec chat, written on the whiteboard in place of the notes.
+           Answers come from my Beli list via backend-for-restaurant-bot- on Render. -->
+      <section class="rec-chat" id="recChat" aria-label="Restaurant recommendations" hidden>
+        <h2 class="rec-heading">Restaurant recs</h2>
+        <button class="rec-close" id="recClose" type="button" aria-label="Close restaurant chat">&times;</button>
+        <div class="rec-log" id="recLog" aria-live="polite"></div>
+        <div class="rec-suggestions" id="recSuggestions">
+          <button type="button">sushi in NYC</button>
+          <button type="button">cafes in Pittsburgh</button>
+          <button type="button">dessert in Japan</button>
+        </div>
+        <form class="rec-form" id="recForm">
+          <input id="recInput" type="text" autocomplete="off" maxlength="500"
+                 placeholder="a city + a cuisine, e.g. tapas in San Sebastián"
+                 aria-label="Ask for a restaurant rec" />
+          <button type="submit">Send</button>
+        </form>
+      </section>
+
+      <!-- "ABOUT" tent card on the desk -->
+      <a class="hotspot about" href="about.html" style="--x:598; --y:618; --w:165; --h:80" aria-label="About"></a>
+
+      <!-- Phone screen overlay (skewed to match the drawn phone) -->
+      <div class="phone-screen">
+        <div class="clock" id="clock" aria-live="off">00:00</div>
+        <div class="phone-apps">
+          <a class="app" href="https://www.linkedin.com/in/emma-gelman-a0129829a" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <a class="app" href="https://github.com/emmagelman-alt" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a class="app" href="mailto:emma.gelman@icloud.com">email</a>
+        </div>
+      </div>
+
+      <!-- Credit line, sitting between the desk leg and the whiteboard's right leg -->
+      <p class="credit">&copy; Emma Gelman 2026 | Built for 15-113 | Designed by hand, brought to life with Claude code</p>
+
+      <!-- Speech bubble shown when something isn't ready yet -->
+      <div class="bubble" id="bubble" role="status" hidden>Coming soon!</div>
+
+      <!-- Shown only if the frame images can't be found -->
+      <div class="missing-frames" id="missingFrames" hidden>
+        Add your animation frames to <code>images/frames/</code> as
+        <code>frame-01.png</code> … <code>frame-07.png</code>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/script.js?v=6"></script>
+</body>
+</html>
