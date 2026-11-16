@@ -1,14 +1,14 @@
 The three piees of logic I picked are:
 
 1. match answers and loosening the search(lines 214-231)
-    - what is supposed to happen: when the exacty user query returns nothing, the system loosens the search constraints to see if it can cme up wth any matches. if the user reqests a combos earch and nothing is found for the first parameter, grok falls back to searching for what fits in the other parameter. However the problem is that this might not be what the user wanted and can end up pulling a list of irrelevant restaurants.
-    -  there is a check to prevent this but can occasionally be wrong. the check only runs for cuisines witih no place type. If someone asks for “Thai restaurant in Pittsburgh,” Groq could fill in both cuisine = Thai and type = restaurant. If you have no Thai spots there, the last fallback is “type = restaurant, any cuisine,” and the check never runs on that path.
+    - what is supposed to happen: when the exacty user query returns nothing, the system loosens the search constraints to see if it can come up wth any matches. if the user requests a combos each and nothing is found for the first parameter, grok falls back to searching for what fits in the other parameter. However the problem is that this might not be what the user wanted and can end up pulling a list of irrelevant restaurants.
+    -  there is a check to prevent this but can occasionally be wrong. the check only runs for cuisines with no place type. If someone asks for “Thai restaurant in Pittsburgh,” Groq could fill in both cuisine = Thai and type = restaurant. If you have no Thai spots there, the last fallback is “type = restaurant, any cuisine,” and the check never runs on that path.
 
 2. load_places() merging places with multiple entries ( lines 62-70)
-   - what is supposed to happen: treat entries with the same name and ciy as one place. the issue here is when multiple places are a result of different branches but the bot does not know which is which so it merges into the highest and the user only sees one entry but doesnt know which branch earned it.
+   - what is supposed to happen: treat entries with the same name and city as one place. the issue here is when multiple places are a result of different branches but the bot does not know which is which so it merges into the highest and the user only sees one entry but doesn’t know which branch earned it.
 
-3. extract_filters Remove all tags that arent in my lisrt to make sure it can only pull what is in the DB.
-   - what is it supposed to do: throw out any city, country, cuisine or place type that isn’t really in my list, so the bot can never search for something I haven’t been to. It compares the exact text, while the rest of the file ignores capitals and accents. if grok responds with the non accented versions of any city name, then the real city is thrown out and the bot drepsonds with the convention when a city has no visits. this is a problem because it can overlook places I have been. 
+3. extract_filters Remove all tags that aren't in my list to make sure it can only pull what is in the DB.
+   - what is it supposed to do: throw out any city, country, cuisine or place type that isn’t really in my list, so the bot can never search for something I haven’t been to. It compares the exact text, while the rest of the file ignores capitals and accents. if grok responds with the non accented versions of any city name, then the real city is thrown out and the bot responds with the convention when a city has no visits. this is a problem because it can overlook places I have been. 
 
 ## Break-it-on-purpose table
 
@@ -16,7 +16,7 @@ I made five one-line changes to the source on my Mac, one at a time. After each 
 
 | # | Change I made | Test that caught it | Failure message |
 |---|---|---|---|
-| 1 | `frontend/js/recs-logic.js` line 9: `"http://localhost:8000"` → `"http://localhost:8010"` | `apibasereturnhost` (`tests/recs-logic.test.js`) | `AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:` actual `'http://localhost:8010'`, expected `'http://localhost:8000'` |
+| 1 | `frontend/is/recs-logic.js` line 9: `"http://localhost:8000"` → `"http://localhost:8010"` | `apibasereturnhost` (`tests/recs-logic.test.js`) | `AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:` actual `'http://localhost:8010'`, expected `'http://localhost:8000'` |
 | 2 | `frontend/js/recs-logic.js` line 8: `hostname === "localhost"` → `hostname !== "localhost"` | `apibasereturnhost` (`tests/recs-logic.test.js`) | `AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:` actual `'https://emma-restaurant-recs.onrender.com'`, expected `'http://localhost:8000'` |
 | 3 | `app.py` line 23: `MIN_SCORE` default `'8.0'` → `'9.0'` | `test_match_meets_every_search_criterion` (`tests/test_match.py`) | `assert 0 > 0` (where `0 = len([])`) |
 | 4 | `app.py` line 208: `(not cuisine or ...)` → `(True or ...)` | `test_match_meets_every_search_criterion` (`tests/test_match.py`) | `AssertionError: LV. Coffee Project isn't tagged Thai: ['Coffee', 'Coffee Shop']` |
@@ -62,7 +62,7 @@ No test's checks were changed to make it pass. The only edits to existing tests 
 
 **8 of 8 tests pass.** The GitHub Actions workflow (`.github/workflows/tests.yml`) still only runs the 3 JavaScript tests.
 
-Claude changed the test to catch the accent bug for citie slike san sebastiàn. a neew helper filter ignores accents and capitals to make sure that even mispelled requests still recevie the intended result. It also fixed the bug where the system would send every list in a location if it couldnt find an exact cuisine match, now it doesnt default to every other place if it cant find a match. 
+Claude changed the test to catch the accent bug for cities like san Sebastian. a new helper filter ignores accents and capitals to make sure that even misspelled requests still receive the intended result. It also fixed the bug where the system would send every list in a location if it couldn’t find an exact cuisine match, now it doesn’t default to every other place if it cant find a match. 
 
-AI USAGE SUMMERY. I used ai for all the ai relevant steps in the nstructins such as the remaining tests, dettingup a suite, etc. I also used AI to help me understand the asignment. I think i had the mo ttehcnical difficulty with this assignment so I used ai to help me figure out what to do and outline and guide me. I explicitly told me not to give me the direct answers but to make sure I could get to them on my own. An example of this is "yes set it up but dont run the test or make it, help me write the tets by hand dont write it for me". 
+AI USAGE SUMMERY. I used ai for all the ai relevant steps in the instructions such as the remaining tests, setting up a suite, etc. I also used AI to help me understand the assignment. I think i had the mo technical difficulty with this assignment so I used ai to help me figure out what to do and outline and guide me. I explicitly told me not to give me the direct answers but to make sure I could get to them on my own. An example of this is "yes set it up but don’t run the test or make it, help me write the tests by hand don’t write it for me". 
 
