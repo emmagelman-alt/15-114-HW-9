@@ -6,7 +6,7 @@
 // Which backend to talk to, given the page's hostname (location.hostname).
 export function apiBase(hostname) {
   var local = hostname === "localhost" || hostname === "127.0.0.1";
-  return local ? "http://localhost:8010" : "https://emma-restaurant-recs.onrender.com";
+  return local ? "http://localhost:8000" : "https://emma-restaurant-recs.onrender.com";
 }
 
 // Given res.ok and the parsed JSON body of a /api/recs response, returns the body,
